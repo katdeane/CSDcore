@@ -1,7 +1,7 @@
 % this is the most basic csd generation script which can then be inserted
 % into a loop or pipeline for generating multiple CSDs. Have a look at
 % SingleTrialCSD* scripts in my pipelines for a fuller version and for more
-% types of output. 
+% types of output. Email me at katrinad@ucr.edu for assistance.
 
 clear; % clear your workspace
 % make sure Matlab is open in the main current directory
@@ -10,8 +10,8 @@ homedir = pwd; % print working directory
 addpath(genpath(homedir)); % genpath includes all subfolders into working directory now
 
 % load or generated LFP data (channels x time x trials)
-%generate LFP = rand(16,1000,20); % a 16 channel probe over 1000 ms for 20 trials
-load('LFP_data.mat','LFP'); % load the mat with LFP data (provided)
+LFP = rand(16,1000,20); % generate a 16 channel probe over 1000 ms for 20 trials
+%load('LFP_data.mat','LFP'); % load the mat with LFP data 
 
 % assuming (channel x time x trials) data:
 Ntrials = size(LFP,3); % determine the number of trials 
@@ -28,7 +28,7 @@ paddsiz   = floor(hammsiz/2)+1; % padding size necessary
 singletrialCSD = NaN(size(LFP));
 % loop through trials
 for itrial = 1:Ntrials
-    curLFP = LFP(:, :, itrial);                           % current LFP trial
+    curLFP = LFP(:, :, itrial);                            % current LFP trial
     paddit = padd_linex(curLFP,paddsiz,1);                 % create padding
     hammit = filt_Hamm(paddit,hammsiz,1);                  % apply hamming filter
     singletrialCSD(:,:,itrial) = (get_csd(hammit,1,chan_dist,1))*10^3;  % make csd
@@ -40,7 +40,7 @@ CSD = nanmean(singletrialCSD,3);
 
 figure; % plot CSD
 imagesc(CSD) % this command displays image with scaled colors
-caxis([-0.001 0.001]) % change the color axis
+caxis([-0.001 0.001]) % change the color axis - play with this based on your scaling, see Deane et al 2020 for example CSD output visual
 colormap jet % change the colormap to jet for CSDs (perula is default)
 colorbar % include the colorbar (and scale) into the image
 
@@ -79,5 +79,6 @@ plot(RELRES)
 
 %% 
 
-add_extra_code = 10;
+% Analysis can be further broken down into layer trace analyses and sink activity analyses. 
+% Above are the broadest strokes for CSD for cortical data from laminar probes.
 
